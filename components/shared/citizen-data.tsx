@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import type { PublicSnapshot } from "@/lib/supabase/queries";
 import { useRealtimeRows, useResync, type RealtimeState } from "@/lib/supabase/use-realtime-rows";
 import { highestRiskZone, scoreZones, zoneForPoint, type ScoredZone } from "@/lib/risk-engine/zones";
@@ -58,22 +57,12 @@ export function useCitizenData(): CitizenData {
 }
 
 /**
- * A new alert published while the app is open: an in-app toast styled by
- * severity, plus a device notification if the person enabled them and the tab
- * is in the background.
+ * A new alert published while the app is open: a device notification if the
+ * person enabled them and the tab is in the background. The in-app alarm
+ * (AlertAlarm) rings until the person closes it.
  */
 function announceAlert(alert: Alert, open: () => void) {
-  const label = alert.severity.toUpperCase();
-  const opts = {
-    description: alert.description.length > 140 ? `${alert.description.slice(0, 140)}…` : alert.description,
-    duration: alert.severity === "danger" ? 20_000 : 10_000,
-    action: { label: "View", onClick: open },
-  };
-  const title = `${label} ALERT — ${alert.title}`;
-  if (alert.severity === "danger") toast.error(title, opts);
-  else if (alert.severity === "high" || alert.severity === "watch") toast.warning(title, opts);
-  else toast.info(title, opts);
-  if (alert.severity === "danger" && "vibrate" in navigator) navigator.vibrate?.([300, 150, 300]);
+  const title = `${alert.severity.toUpperCase()} ALERT — ${alert.title}`;
   showDesktopAlert({
     title,
     body: alert.description,

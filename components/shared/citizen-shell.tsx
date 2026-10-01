@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { House, Map, CircleUserRound, Siren, TriangleAlert, WifiOff, LogIn } from "lucide-react";
+import { AlertAlarm } from "@/components/alerts/alert-alarm";
 import { Logo } from "@/components/shared/logo";
 import { useCitizenData } from "@/components/shared/citizen-data";
 import { SimulationBanner } from "@/components/shared/simulation-banner";
@@ -90,6 +91,8 @@ export function CitizenShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className={cn("flex-1", fullBleed ? "" : "px-4 pt-4 pb-28")}>{children}</main>
+
+        <AlertAlarm />
 
         <nav
           aria-label="Main"

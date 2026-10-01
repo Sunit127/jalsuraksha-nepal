@@ -227,11 +227,17 @@ citizens may cancel from any open state. Authoritative table:
 ## 9. Features (MVP scope)
 
 1. **Alerts** — severity-coloured banners with text labels and explicit source
-   ("JalSuraksha Hackathon Demo" for simulated). A new alert published while a
-   citizen has the app open raises a severity-styled toast (danger: longer,
-   vibrates) and, if the citizen opted in on the Alerts page, a device
-   notification while the tab is in the background. Rescue consoles likewise
-   offer device notifications for new missions.
+   ("JalSuraksha Hackathon Demo" for simulated). A new alert raises a
+   full-screen alarm on every citizen screen: a repeating "beep-beep" (Web
+   Audio, unlocked by the first tap) plus vibration until the person taps
+   "stop alarm". Closed alerts are remembered per device; alerts published
+   while the app was closed ring on the next open while still active; on a
+   device's first visit the already-active alerts count as seen. If the
+   citizen opted in on the Alerts page, a device notification is shown while
+   the tab is in the background. Simulated alerts are hidden from citizens in
+   live data mode, so in live mode the publish form defaults to Official
+   (source: the control centre) and warns when Simulated is chosen. Rescue
+   consoles likewise offer device notifications for new missions.
 2. **Live map** — user location, risk zones, SOS (staff only), shelters,
    hospitals, rescue teams (staff), hazards; legend; detail popups with actions.
 3. **Flood risk engine** — transparent weighted rule-based score with

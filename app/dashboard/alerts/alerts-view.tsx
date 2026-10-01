@@ -15,21 +15,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { DEMO_SOURCE_LABEL } from "@/lib/demo/scenario";
 import type { AlertInput } from "@/lib/validation/schemas";
 
-const EMPTY: AlertInput = {
-  title: "",
-  description: "",
-  severity: "high",
-  district: "Chitwan",
-  municipality: "Bharatpur Metropolitan City",
-  riverBasin: "Narayani",
-  source: DEMO_SOURCE_LABEL,
-  sourceType: "simulated",
-  expiresInHours: 12,
-};
+const CONTROL_CENTRE_SOURCE = "JalSuraksha Emergency Operations Centre";
+
+/**
+ * Citizens never see simulated alerts while live data is on, so in live mode
+ * an alert from this control centre defaults to Official.
+ */
+function emptyAlert(dataMode: "live" | "simulation"): AlertInput {
+  return {
+    title: "",
+    description: "",
+    severity: "high",
+    district: "Chitwan",
+    municipality: "Bharatpur Metropolitan City",
+    riverBasin: "Narayani",
+    source: dataMode === "live" ? CONTROL_CENTRE_SOURCE : DEMO_SOURCE_LABEL,
+    sourceType: dataMode === "live" ? "official" : "simulated",
+    expiresInHours: 12,
+  };
+}
 
 export default function AlertsAdminPage() {
-  const { alerts } = useOpsData();
-  const [form, setForm] = useState<AlertInput>(EMPTY);
+  const { alerts, dataMode } = useOpsData();
+  const [form, setForm] = useState<AlertInput>(() => emptyAlert(dataMode));
   const [pending, startTransition] = useTransition();
   const set = <K extends keyof AlertInput>(k: K, v: AlertInput[K]) => setForm((f) => ({ ...f, [k]: v }));
   const [now] = useState(() => Date.now());
@@ -41,7 +49,7 @@ export default function AlertsAdminPage() {
       const res = await publishAlert(form);
       if (res.ok) {
         toast.success(res.message);
-        setForm(EMPTY);
+        setForm(emptyAlert(dataMode));
       } else toast.error(res.error);
     });
   }
@@ -112,9 +120,16 @@ export default function AlertsAdminPage() {
                 </Select>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Only mark an alert “Official” when it comes from DHM or a government authority.
-            </p>
+            {dataMode === "live" && form.sourceType === "simulated" ? (
+              <p role="alert" className="text-xs font-medium text-danger-ink">
+                Live data is on: citizens will NOT see a simulated alert. Choose Official or Community.
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Official: issued by this control centre, DHM or a government authority. Every citizen with the app
+                gets an alarm that rings until they close it.
+              </p>
+            )}
             <Button type="submit" disabled={pending}>
               {pending ? <Loader2 className="animate-spin" /> : <Megaphone />} Publish to citizens
             </Button>
