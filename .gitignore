@@ -50,3 +50,7 @@ supabase/.branches
 
 # self-hosted routing data (downloaded OSM extract + generated tiles)
 /routing/custom_files/
+
+# AI assistant skills installed locally by the Vercel Supabase integration
+/.agents/
+/skills-lock.json
