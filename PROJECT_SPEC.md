@@ -108,6 +108,7 @@ Next.js on Vercel                                                 │
        ├─ GET  /api/health      public ok flag; staff readiness    │
        ├─ POST /api/sos/cancel  guest "I am safe now" (token)      │
        ├─ POST /api/sos/location live caller position (token)     │
+       ├─ POST /api/push/subscribe lock-screen alert opt-in        │
        ├─ POST /api/uploads     type/size-validated photo upload   │
        ├─ GET  /api/public/snapshot  offline cache payload         │
        ├─ POST /api/sms/inbound future SMS gateway (secret-gated)  │
@@ -164,6 +165,7 @@ enabled. Demo rows carry `is_demo = true` and/or `source_type = 'simulated'`.
 |---|---|---|
 | `profiles` | 1:1 with `auth.users` | phone, full_name, role, district, municipality, ward, emergency_contact, safety_status, rescue_team_id |
 | `alerts` | Flood alerts | title, description, severity, district, municipality, river_basin, source, source_type, is_active, expires_at |
+| `push_subscriptions` | Devices opted in to lock-screen alerts (server-only) | endpoint (unique), p256dh, auth, user_id, last_sent_at |
 | `risk_zones` | Areas scored by the risk engine | name, polygon (jsonb `[lat,lng][]`), centre, river_level_m, warning_level_m, danger_level_m, rainfall_mm_24h, distance_to_river_m, elevation_vulnerability, road_access_reduction |
 | `shelters` | Evacuation shelters | address, lat/lng, capacity, current_occupancy, food/water status, medical_assistance, contact, is_active |
 | `hazard_reports` | Community hazards | type, severity, lat/lng, description, photo_url, status, confirmation_count, duplicate_of |
@@ -238,7 +240,17 @@ citizens may cancel from any open state. Authoritative table:
    while the app was closed ring on the next open while still active; on a
    device's first visit the already-active alerts count as seen. If the
    citizen opted in on the Alerts page, a device notification is shown while
-   the tab is in the background. Simulated alerts are hidden from citizens in
+   the tab is in the background. **Lock-screen alerts (Web Push):** citizens
+   tap "Turn on lock-screen alerts" (home card / Alerts page); the browser
+   subscription is stored server-only in `push_subscriptions` (no RLS
+   policies; `/api/push/subscribe` POST/DELETE). Each new alert that citizens
+   can see (manual or automatic DHM gauge alert) is pushed to every device
+   with high urgency and a TTL until the alert expires; the service worker
+   shows a notification that stays until dismissed, with the device's
+   notification sound and a long vibration (a locked phone cannot play the
+   in-app siren; opening the notification shows it). Gone subscriptions
+   (404/410) are deleted. iPhone needs the app on the Home Screen
+   (iOS 16.4+). Simulated alerts are hidden from citizens in
    live data mode, so in live mode the publish form defaults to Official
    (source: the control centre) and warns when Simulated is chosen. Rescue
    consoles likewise offer device notifications for new missions.

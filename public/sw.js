@@ -137,3 +137,46 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(cacheable ? networkFirst(request, SHELL, "/offline") : fetch(request).catch(() => offlineFallback(request, "/offline")));
   }
 });
+
+/*
+ * Lock-screen flood alerts (Web Push). The server sends
+ * { title, body, tag, url, urgent } — see lib/services/push.ts. The
+ * notification stays until dismissed, uses the device's notification sound
+ * and a long vibration; opening it shows the in-app siren.
+ */
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : "" };
+  }
+  const title = data.title || "JalSuraksha flood alert";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || "Open JalSuraksha for details.",
+      tag: data.tag || "jalsuraksha-alert",
+      renotify: true,
+      requireInteraction: true,
+      silent: false,
+      vibrate: data.urgent
+        ? [800, 200, 800, 200, 800, 200, 800, 200, 800]
+        : [500, 200, 500, 200, 500],
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url: data.url || "/citizen/alerts" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || "/citizen/alerts", self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      const open = windows.find((w) => new URL(w.url).origin === self.location.origin);
+      if (open) return open.focus().then((w) => (w && "navigate" in w ? w.navigate(url) : w));
+      return self.clients.openWindow(url);
+    }),
+  );
+});

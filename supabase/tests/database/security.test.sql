@@ -2,7 +2,7 @@
 -- Run with: npx supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(55);
+select plan(58);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures: one user per role (profiles are created by the auth trigger)
@@ -201,6 +201,17 @@ update public.sos_requests set status = 'cancelled' where id = 'bbbbbbbb-0000-40
 select public.update_sos_location_with_token('SOS-NEP-9009', 'cccccccc-0000-4000-8000-000000000009', 27.7, 84.5, 5);
 select ok((select latitude = 27.61 from public.sos_requests where id = 'bbbbbbbb-0000-4000-8000-000000000009'),
   'a closed SOS keeps its last position');
+
+-- Push subscriptions: server-only
+insert into public.push_subscriptions (endpoint, p256dh, auth) values ('https://push.example/abc', 'k', 'a');
+set local role anon;
+select throws_ok($$ select count(*) from public.push_subscriptions $$, '42501', null, 'browsers cannot read push subscriptions');
+select throws_ok($$ insert into public.push_subscriptions (endpoint, p256dh, auth) values ('https://push.example/x', 'k', 'a') $$,
+  '42501', null, 'browsers cannot write push subscriptions directly');
+set local role authenticated;
+select pg_temp.act_as('11111111-1111-4111-8111-111111111111');
+select throws_ok($$ select count(*) from public.push_subscriptions $$, '42501', null, 'signed-in users cannot read others'' push subscriptions');
+reset role;
 
 select * from finish();
 rollback;

@@ -200,6 +200,19 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"push_subscriptions": {
+                  Row: {
+                    "auth": string,"created_at": string,"endpoint": string,"id": string,"last_sent_at": string | null,"p256dh": string,"updated_at": string,"user_id": string | null
+                  }
+                  Insert: {
+                    "auth": string,"created_at"?: string,"endpoint": string,"id"?: string,"last_sent_at"?: string | null,"p256dh": string,"updated_at"?: string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "auth"?: string,"created_at"?: string,"endpoint"?: string,"id"?: string,"last_sent_at"?: string | null,"p256dh"?: string,"updated_at"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"rescue_assignments": {
                   Row: {
                     "accepted_at": string | null,"arrived_at": string | null,"assigned_at": string,"assigned_by": string | null,"completed_at": string | null,"created_at": string,"en_route_at": string | null,"id": string,"notes": string | null,"rescue_team_id": string,"sos_id": string,"status": Database["public"]['Enums']["assignment_status"],"updated_at": string

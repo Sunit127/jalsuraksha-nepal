@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { syncHydromet } from "@/lib/hydromet/sync";
 import { importReferenceData } from "@/lib/services/reference-data";
+import { sendAlertPush } from "@/lib/services/push";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { parseShelterCsv } from "@/lib/utilities/shelter-csv";
 import { authorize } from "@/lib/auth/session";
@@ -153,7 +154,7 @@ export async function publishAlert(input: AlertInput): Promise<OpsResult> {
   const ctx = await staffClient();
   if (!ctx) return DENIED;
   const v = parsed.data;
-  const { error } = await ctx.supabase.from("alerts").insert({
+  const { data: alert, error } = await ctx.supabase.from("alerts").insert({
     title: v.title,
     description: v.description,
     severity: v.severity,
@@ -164,11 +165,13 @@ export async function publishAlert(input: AlertInput): Promise<OpsResult> {
     source_type: v.sourceType,
     created_by: ctx.session.userId,
     expires_at: new Date(Date.now() + v.expiresInHours * 3600_000).toISOString(),
-  });
-  if (error) {
-    console.error("[ops] alert insert failed", error.message);
+  }).select().single();
+  if (error || !alert) {
+    console.error("[ops] alert insert failed", error?.message);
     return { ok: false, error: "Could not publish the alert." };
   }
+  // Lock-screen notification for subscribed devices, after the response.
+  after(() => sendAlertPush(alert).then(() => undefined));
   revalidatePath("/dashboard/alerts");
   return { ok: true, message: "Alert published to citizens." };
 }

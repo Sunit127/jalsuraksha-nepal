@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { inPilotBbox } from "@/lib/geo/pilot-area";
+import { sendAlertPush } from "@/lib/services/push";
 import { DATA_USER_AGENT } from "@/lib/services/reference-data";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Database, Json } from "@/types/database.types";
@@ -228,8 +229,11 @@ async function applyGaugeAlerts(admin: Admin, stations: HydrometStation[], now: 
     if (existing) {
       await admin.from("alerts").update(fields).eq("id", existing.id);
     } else {
-      const { error } = await admin.from("alerts").insert({ ...fields, station_id: s.id });
-      if (!error) raised += 1;
+      const { data: alert, error } = await admin.from("alerts").insert({ ...fields, station_id: s.id }).select().single();
+      if (!error && alert) {
+        raised += 1;
+        await sendAlertPush(alert);
+      }
     }
   }
   return { raised, withdrawn };

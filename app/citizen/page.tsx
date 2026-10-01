@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronRight, Clock3, Map as MapIcon, Navigation, Radio, Siren, ThumbsUp } from "lucide-react";
 import { AlertCard } from "@/components/alerts/alert-card";
+import { PushAlertsToggle } from "@/components/alerts/push-alerts-toggle";
 import { RiskStatusCard } from "@/components/alerts/risk-status-card";
 import { RiverGaugeCard } from "@/components/alerts/river-gauge-card";
 import { LiveMap } from "@/components/map";
@@ -26,6 +27,7 @@ export default function CitizenHomePage() {
   return (
     <div className="grid gap-4">
       <LocationChip />
+      <PushAlertsToggle variant="card" />
 
       <ActiveSosCard />
       <RiskStatusCard zone={focusZone} isUserZone={data.focusIsUserZone} locationLabel={location.label} />

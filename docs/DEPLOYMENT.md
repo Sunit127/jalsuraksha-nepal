@@ -98,6 +98,12 @@ Under **Project Settings → API Keys**, copy:
    | `SEND_SMS_HOOK_SECRET` | the Send SMS hook secret (see 1.2) |
    | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | from the Twilio console |
    | `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER` | one of the two |
+   | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | a key pair from `npx web-push generate-vapid-keys` (lock-screen alerts) |
+   | `VAPID_SUBJECT` | your site URL, e.g. `https://<your-vercel-domain>` |
+
+   Lock-screen alerts work in Chrome/Edge/Firefox on Android and desktop. On
+   iPhone/iPad (iOS 16.4+) they work only after the citizen adds the app to
+   the Home Screen and turns alerts on from there.
 
 3. Deploy. Then add the deployment URL to Supabase **Auth → URL Configuration**.
 

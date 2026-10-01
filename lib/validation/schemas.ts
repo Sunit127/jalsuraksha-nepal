@@ -130,6 +130,15 @@ export const sosTrackQuerySchema = z.object({
   token: uuidSchema,
 });
 
+/** A browser PushSubscription (toJSON()) for lock-screen alerts. */
+export const pushSubscriptionSchema = z.object({
+  endpoint: z.url({ protocol: /^https$/ }).max(1000),
+  keys: z.object({
+    p256dh: z.string().min(1).max(200),
+    auth: z.string().min(1).max(100),
+  }),
+});
+
 /** Live position update from the caller's phone while the SOS is open. */
 export const sosLocationUpdateSchema = sosTrackQuerySchema.extend({
   latitude: latitudeSchema,

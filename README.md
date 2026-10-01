@@ -193,6 +193,9 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_DEMO_MODE` | browser + server | `true` enables demo-account buttons, scenario controls and the simulated citizen location |
 | `DEMO_ACCOUNT_PASSWORD` | **server only** | Shared password for the four demo accounts (8+ characters) |
 | `SMS_GATEWAY_SECRET` | **server only** | Enables the future SMS inbound endpoint. Leave empty to keep it disabled |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | browser + server | Web Push public key for lock-screen flood alerts (`npx web-push generate-vapid-keys`). Empty disables push |
+| `VAPID_PRIVATE_KEY` | **server only** | The matching Web Push private key |
+| `VAPID_SUBJECT` | **server only** | Contact for push services: the site URL or a `mailto:` address |
 
 The secret key and the demo password are never sent to the browser.
 
