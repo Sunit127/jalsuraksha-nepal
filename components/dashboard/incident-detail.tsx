@@ -186,6 +186,12 @@ export function IncidentDetail({
                   <dd className="tabular">{sos.latitude.toFixed(5)}, {sos.longitude.toFixed(5)}</dd>
                   <dt className="text-muted-foreground">GPS accuracy</dt>
                   <dd>{sos.location_accuracy_m ? `±${sos.location_accuracy_m} m` : "Unknown"}</dd>
+                  <dt className="text-muted-foreground">Location</dt>
+                  <dd data-testid="location-updated">
+                    {sos.location_updated_at
+                      ? `Live from caller's phone · updated ${timeAgo(sos.location_updated_at)}`
+                      : `Sent with the SOS · ${timeAgo(sos.created_at)}`}
+                  </dd>
                   <dt className="text-muted-foreground">Account</dt>
                   <dd>{sos.user_id ? "App session" : "Guest (no session)"}</dd>
                   {citizen && (

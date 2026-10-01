@@ -107,6 +107,7 @@ Next.js on Vercel                                                 │
        ├─ GET  /api/sos/track   token-based status fallback        │
        ├─ GET  /api/health      public ok flag; staff readiness    │
        ├─ POST /api/sos/cancel  guest "I am safe now" (token)      │
+       ├─ POST /api/sos/location live caller position (token)     │
        ├─ POST /api/uploads     type/size-validated photo upload   │
        ├─ GET  /api/public/snapshot  offline cache payload         │
        ├─ POST /api/sms/inbound future SMS gateway (secret-gated)  │
@@ -269,7 +270,17 @@ citizens may cancel from any open state. Authoritative table:
    triggers "ROUTE UPDATED" and shows the blocked normal route.
 6. **SOS** — guest-capable form (GPS, phone, people, children, elderly, injury,
    situation, description, photo); reference `SOS-NEP-####`; priority
-   recommendation; realtime timeline; duplicate protection.
+   recommendation; realtime timeline; duplicate protection. The location is
+   the device's real GPS by default (in demo mode the simulated riverside
+   location is used only after the user picks "Use demo location"). While the
+   SOS is open, the phone that sent it with GPS keeps sharing its live position
+   (`/api/sos/location`, tracking token; every ≥10 s after moving 15 m plus a
+   1-minute heartbeat; Pause available). It updates `sos_requests.latitude/
+   longitude` and `location_updated_at`, so staff and team maps follow the
+   caller through Realtime. Positions sent from the map picker or the demo
+   location are never overwritten, and a closed SOS keeps its last position.
+   The dashboard overview selects each newly arrived SOS so the map flies to
+   the caller, even outside the area in view.
 7. **Operations dashboard** — KPIs, live map, filterable/sortable incident
    queue, assign team, override priority, resolve, Recharts analytics. In the
    default priority sort, SOS no operator has opened yet (`received`) are

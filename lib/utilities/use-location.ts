@@ -49,9 +49,9 @@ export const LOCATION_ERROR_MESSAGE: Record<Exclude<LocationError, null>, string
 };
 
 /**
- * Shared location state. In demo mode the default is the simulated riverside
- * location so the presentation is reproducible anywhere; users can switch to
- * real GPS at any time (the choice is remembered).
+ * Shared location state. Real GPS is the default; in demo mode users can
+ * switch to the simulated riverside location for a reproducible presentation
+ * (the choice is remembered).
  */
 export function useLocationState(demoMode: boolean): LocationState {
   const [mode, setMode] = useState<LocationSource | null>(null);
@@ -66,11 +66,12 @@ export function useLocationState(demoMode: boolean): LocationState {
 
   // Resolve the initial mode on the client only (avoids hydration mismatch).
   useEffect(() => {
-    // A "demo" preference left over from a presentation must never place a
-    // real caller at the simulated location once demo mode is off.
+    // Real GPS by default, so an SOS carries the caller's true position. The
+    // simulated location is used only after someone picks it in demo mode,
+    // and a leftover "demo" choice never applies once demo mode is off.
     const pref = readPref();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reading a browser-only preference after mount
-    setMode(pref === "demo" && !demoMode ? "gps" : (pref ?? (demoMode ? "demo" : "gps")));
+    setMode(pref === "demo" && demoMode ? "demo" : "gps");
   }, [demoMode]);
 
   useEffect(() => {

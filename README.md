@@ -348,7 +348,7 @@ as you go (steps 1–3 are just screens to show).
 1. Open `/dashboard/demo` as Operator Demo and press **Reset demo data**.
 2. Check that **System check** says **Ready to present** (env, database, demo data, R-03 available, demo accounts).
 3. Open the three windows. The header pill should say **LIVE** on the operator screen.
-4. Check the citizen window shows the demo location chip ("Riverside Tole … (demo location)").
+4. In the citizen window tap **Use demo location** (the app starts on real GPS) and check the chip shows "Riverside Tole … (demo location)".
 5. If the venue Wi-Fi blocks OpenStreetMap, the map shows a "Street map unavailable" label; overlays and routes still work.
 
 `GET /api/health` returns `{ ok }` publicly (for uptime monitors) and the detailed checklist to signed-in staff.

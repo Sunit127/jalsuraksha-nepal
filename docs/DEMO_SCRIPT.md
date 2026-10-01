@@ -14,7 +14,7 @@ coordinated evacuation, shelter and rescue workflows.
 | C: Rescue, tablet or private window | `/rescue` | Rescue Team Demo |
 
 1. In window B, press **Presentation mode → Reset demo data** so timestamps are fresh.
-2. Make sure window A uses the **demo location** (the chip at the top says "Riverside Tole, Bharatpur-1 (demo location)").
+2. Make sure window A uses the **demo location**: the app starts on real GPS, so tap **Use demo location** in the location chip (it then says "Riverside Tole, Bharatpur-1 (demo location)" and is remembered).
 3. Say it up front: *"Everything you see is simulated data for the Narayani basin."*
 
 ## Script

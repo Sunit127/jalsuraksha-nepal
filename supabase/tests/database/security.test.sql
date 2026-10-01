@@ -2,7 +2,7 @@
 -- Run with: npx supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(50);
+select plan(55);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures: one user per role (profiles are created by the auth trigger)
@@ -183,6 +183,24 @@ select throws_ok($$ insert into public.team_locations (team_id, latitude, longit
 select pg_temp.act_as('22222222-2222-4222-8222-222222222222');
 select is((select count(*) from public.team_locations)::int, 0, 'other citizens cannot see where teams are');
 reset role;
+
+-- Live caller location: token-proven, server-only, open SOS only
+insert into public.sos_requests (id, reference_code, tracking_token, phone, latitude, longitude, situation, people_count)
+values ('bbbbbbbb-0000-4000-8000-000000000009', 'SOS-NEP-9009', 'cccccccc-0000-4000-8000-000000000009', '+9779800000009', 27.60, 84.40, 'water_rising', 1);
+set local role anon;
+select throws_ok($$ select public.update_sos_location_with_token('SOS-NEP-9009', 'cccccccc-0000-4000-8000-000000000009', 27.61, 84.41, 20) $$,
+  '42501', null, 'browsers cannot call the live-location function directly');
+reset role;
+select throws_ok($$ select public.update_sos_location_with_token('SOS-NEP-9009', 'cccccccc-0000-4000-8000-00000000000f', 27.61, 84.41, 20) $$,
+  'P0001', 'NOT_FOUND: SOS request not found', 'a wrong tracking token cannot move an SOS');
+select lives_ok($$ select public.update_sos_location_with_token('SOS-NEP-9009', 'cccccccc-0000-4000-8000-000000000009', 27.61, 84.41, 20) $$,
+  'the caller''s phone updates its SOS position');
+select ok((select latitude = 27.61 and longitude = 84.41 and location_accuracy_m = 20 and location_updated_at is not null
+  from public.sos_requests where id = 'bbbbbbbb-0000-4000-8000-000000000009'), 'the new position and its time are stored');
+update public.sos_requests set status = 'cancelled' where id = 'bbbbbbbb-0000-4000-8000-000000000009';
+select public.update_sos_location_with_token('SOS-NEP-9009', 'cccccccc-0000-4000-8000-000000000009', 27.7, 84.5, 5);
+select ok((select latitude = 27.61 from public.sos_requests where id = 'bbbbbbbb-0000-4000-8000-000000000009'),
+  'a closed SOS keeps its last position');
 
 select * from finish();
 rollback;

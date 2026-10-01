@@ -130,6 +130,13 @@ export const sosTrackQuerySchema = z.object({
   token: uuidSchema,
 });
 
+/** Live position update from the caller's phone while the SOS is open. */
+export const sosLocationUpdateSchema = sosTrackQuerySchema.extend({
+  latitude: latitudeSchema,
+  longitude: longitudeSchema,
+  accuracyM: z.number().finite().min(0).optional(),
+});
+
 // ---------------------------------------------------------------------------
 // Hazard reports
 // ---------------------------------------------------------------------------

@@ -15,6 +15,15 @@ export default function OperationsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const openSos = data.sos.filter((s) => isSosOpen(s.status));
 
+  // A new incident is selected as it arrives so the map flies to the caller,
+  // even when they are outside the area currently in view.
+  const [seenIds, setSeenIds] = useState(() => new Set(openSos.map((s) => s.id)));
+  const arrived = openSos.find((s) => !seenIds.has(s.id));
+  if (arrived) {
+    setSeenIds(new Set(openSos.map((s) => s.id)));
+    setSelectedId(arrived.id);
+  }
+
   return (
     <div className="grid grid-cols-1 gap-4 p-4 lg:p-5">
       <div className="flex flex-wrap items-end justify-between gap-2">

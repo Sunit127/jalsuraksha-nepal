@@ -19,7 +19,7 @@ import { createSupabaseServerClient } from "./server";
 
 /** SOS columns for staff views (the guest tracking token is never sent). */
 export const SOS_STAFF_COLUMNS =
-  "id, reference_code, user_id, phone, latitude, longitude, location_accuracy_m, location_name, people_count, children_count, elderly_count, injured, situation, description, photo_path, priority_score, priority_level, priority_factors, operator_priority_override, priority_override_note, effective_priority, status, assigned_team_id, source, is_demo, acknowledged_at, resolved_at, created_at, updated_at";
+  "id, reference_code, user_id, phone, latitude, longitude, location_accuracy_m, location_name, location_updated_at, people_count, children_count, elderly_count, injured, situation, description, photo_path, priority_score, priority_level, priority_factors, operator_priority_override, priority_override_note, effective_priority, status, assigned_team_id, source, is_demo, acknowledged_at, resolved_at, created_at, updated_at";
 
 export type StaffSos = Omit<SosRequest, "tracking_token">;
 

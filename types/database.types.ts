@@ -284,13 +284,13 @@ isOneToOne: false
                   ]
                 },"sos_requests": {
                   Row: {
-                    "acknowledged_at": string | null,"assigned_team_id": string | null,"children_count": number,"created_at": string,"description": string | null,"effective_priority": Database["public"]['Enums']["priority_level"] | null,"elderly_count": number,"id": string,"injured": boolean,"is_demo": boolean,"latitude": number,"location_accuracy_m": number | null,"location_name": string | null,"longitude": number,"operator_priority_override": Database["public"]['Enums']["priority_level"] | null,"people_count": number,"phone": string,"photo_path": string | null,"priority_factors": NonNullable<Json>,"priority_level": Database["public"]['Enums']["priority_level"],"priority_override_note": string | null,"priority_score": number,"reference_code": string,"resolved_at": string | null,"situation": Database["public"]['Enums']["sos_situation"],"source": string,"status": Database["public"]['Enums']["sos_status"],"tracking_token": string,"updated_at": string,"user_id": string | null
+                    "acknowledged_at": string | null,"assigned_team_id": string | null,"children_count": number,"created_at": string,"description": string | null,"effective_priority": Database["public"]['Enums']["priority_level"] | null,"elderly_count": number,"id": string,"injured": boolean,"is_demo": boolean,"latitude": number,"location_accuracy_m": number | null,"location_name": string | null,"location_updated_at": string | null,"longitude": number,"operator_priority_override": Database["public"]['Enums']["priority_level"] | null,"people_count": number,"phone": string,"photo_path": string | null,"priority_factors": NonNullable<Json>,"priority_level": Database["public"]['Enums']["priority_level"],"priority_override_note": string | null,"priority_score": number,"reference_code": string,"resolved_at": string | null,"situation": Database["public"]['Enums']["sos_situation"],"source": string,"status": Database["public"]['Enums']["sos_status"],"tracking_token": string,"updated_at": string,"user_id": string | null
                   }
                   Insert: {
-                    "acknowledged_at"?: string | null,"assigned_team_id"?: string | null,"children_count"?: number,"created_at"?: string,"description"?: string | null,"effective_priority"?: never,"elderly_count"?: number,"id"?: string,"injured"?: boolean,"is_demo"?: boolean,"latitude": number,"location_accuracy_m"?: number | null,"location_name"?: string | null,"longitude": number,"operator_priority_override"?: Database["public"]['Enums']["priority_level"] | null,"people_count"?: number,"phone": string,"photo_path"?: string | null,"priority_factors"?: NonNullable<Json>,"priority_level"?: Database["public"]['Enums']["priority_level"],"priority_override_note"?: string | null,"priority_score"?: number,"reference_code"?: string,"resolved_at"?: string | null,"situation": Database["public"]['Enums']["sos_situation"],"source"?: string,"status"?: Database["public"]['Enums']["sos_status"],"tracking_token"?: string,"updated_at"?: string,"user_id"?: string | null
+                    "acknowledged_at"?: string | null,"assigned_team_id"?: string | null,"children_count"?: number,"created_at"?: string,"description"?: string | null,"effective_priority"?: never,"elderly_count"?: number,"id"?: string,"injured"?: boolean,"is_demo"?: boolean,"latitude": number,"location_accuracy_m"?: number | null,"location_name"?: string | null,"location_updated_at"?: string | null,"longitude": number,"operator_priority_override"?: Database["public"]['Enums']["priority_level"] | null,"people_count"?: number,"phone": string,"photo_path"?: string | null,"priority_factors"?: NonNullable<Json>,"priority_level"?: Database["public"]['Enums']["priority_level"],"priority_override_note"?: string | null,"priority_score"?: number,"reference_code"?: string,"resolved_at"?: string | null,"situation": Database["public"]['Enums']["sos_situation"],"source"?: string,"status"?: Database["public"]['Enums']["sos_status"],"tracking_token"?: string,"updated_at"?: string,"user_id"?: string | null
                   }
                   Update: {
-                    "acknowledged_at"?: string | null,"assigned_team_id"?: string | null,"children_count"?: number,"created_at"?: string,"description"?: string | null,"effective_priority"?: never,"elderly_count"?: number,"id"?: string,"injured"?: boolean,"is_demo"?: boolean,"latitude"?: number,"location_accuracy_m"?: number | null,"location_name"?: string | null,"longitude"?: number,"operator_priority_override"?: Database["public"]['Enums']["priority_level"] | null,"people_count"?: number,"phone"?: string,"photo_path"?: string | null,"priority_factors"?: NonNullable<Json>,"priority_level"?: Database["public"]['Enums']["priority_level"],"priority_override_note"?: string | null,"priority_score"?: number,"reference_code"?: string,"resolved_at"?: string | null,"situation"?: Database["public"]['Enums']["sos_situation"],"source"?: string,"status"?: Database["public"]['Enums']["sos_status"],"tracking_token"?: string,"updated_at"?: string,"user_id"?: string | null
+                    "acknowledged_at"?: string | null,"assigned_team_id"?: string | null,"children_count"?: number,"created_at"?: string,"description"?: string | null,"effective_priority"?: never,"elderly_count"?: number,"id"?: string,"injured"?: boolean,"is_demo"?: boolean,"latitude"?: number,"location_accuracy_m"?: number | null,"location_name"?: string | null,"location_updated_at"?: string | null,"longitude"?: number,"operator_priority_override"?: Database["public"]['Enums']["priority_level"] | null,"people_count"?: number,"phone"?: string,"photo_path"?: string | null,"priority_factors"?: NonNullable<Json>,"priority_level"?: Database["public"]['Enums']["priority_level"],"priority_override_note"?: string | null,"priority_score"?: number,"reference_code"?: string,"resolved_at"?: string | null,"situation"?: Database["public"]['Enums']["sos_situation"],"source"?: string,"status"?: Database["public"]['Enums']["sos_status"],"tracking_token"?: string,"updated_at"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -360,6 +360,7 @@ isOneToOne: true
 "latitude": number,
 "location_accuracy_m": number | null,
 "location_name": string | null,
+"location_updated_at": string | null,
 "longitude": number,
 "operator_priority_override": Database["public"]['Enums']["priority_level"] | null,
 "people_count": number,
@@ -424,6 +425,7 @@ isOneToOne: true
 "latitude": number,
 "location_accuracy_m": number | null,
 "location_name": string | null,
+"location_updated_at": string | null,
 "longitude": number,
 "operator_priority_override": Database["public"]['Enums']["priority_level"] | null,
 "people_count": number,
@@ -463,6 +465,7 @@ isOneToOne: true
 "latitude": number,
 "location_accuracy_m": number | null,
 "location_name": string | null,
+"location_updated_at": string | null,
 "longitude": number,
 "operator_priority_override": Database["public"]['Enums']["priority_level"] | null,
 "people_count": number,
@@ -517,6 +520,7 @@ isOneToOne: true
 "latitude": number,
 "location_accuracy_m": number | null,
 "location_name": string | null,
+"location_updated_at": string | null,
 "longitude": number,
 "operator_priority_override": Database["public"]['Enums']["priority_level"] | null,
 "people_count": number,
@@ -580,6 +584,7 @@ isOneToOne: true
 "latitude": number,
 "location_accuracy_m": number | null,
 "location_name": string | null,
+"location_updated_at": string | null,
 "longitude": number,
 "operator_priority_override": Database["public"]['Enums']["priority_level"] | null,
 "people_count": number,
@@ -626,6 +631,46 @@ isOneToOne: true
                           SetofOptions: {
         from: "*"
         to: "rescue_assignments"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
+"update_sos_location_with_token":
+{ Args: { "p_accuracy_m": number,"p_latitude": number,"p_longitude": number,"p_reference": string,"p_token": string }; Returns: {
+              "acknowledged_at": string | null,
+"assigned_team_id": string | null,
+"children_count": number,
+"created_at": string,
+"description": string | null,
+"effective_priority": Database["public"]['Enums']["priority_level"] | null,
+"elderly_count": number,
+"id": string,
+"injured": boolean,
+"is_demo": boolean,
+"latitude": number,
+"location_accuracy_m": number | null,
+"location_name": string | null,
+"location_updated_at": string | null,
+"longitude": number,
+"operator_priority_override": Database["public"]['Enums']["priority_level"] | null,
+"people_count": number,
+"phone": string,
+"photo_path": string | null,
+"priority_factors": NonNullable<Json>,
+"priority_level": Database["public"]['Enums']["priority_level"],
+"priority_override_note": string | null,
+"priority_score": number,
+"reference_code": string,
+"resolved_at": string | null,
+"situation": Database["public"]['Enums']["sos_situation"],
+"source": string,
+"status": Database["public"]['Enums']["sos_status"],
+"tracking_token": string,
+"updated_at": string,
+"user_id": string | null
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "sos_requests"
         isOneToOne: true
         isSetofReturn: false
       } }

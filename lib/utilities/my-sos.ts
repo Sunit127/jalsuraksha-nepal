@@ -1,7 +1,13 @@
 "use client";
 
 /** SOS references + tracking tokens this device submitted (for guests). */
-export type MySos = { ref: string; token: string; createdAt: string };
+export type MySos = {
+  ref: string;
+  token: string;
+  createdAt: string;
+  /** Sent with this device's GPS: keep sharing its live position while open. */
+  live?: boolean;
+};
 
 const KEY = "js:my-sos:v1";
 
@@ -26,6 +32,11 @@ export function rememberSos(entry: MySos) {
 
 export function tokenForRef(ref: string): string | null {
   return readMySos().find((s) => s.ref === ref)?.token ?? null;
+}
+
+/** True only on the device that sent this SOS with its own GPS position. */
+export function sharesLiveLocation(ref: string): boolean {
+  return readMySos().find((s) => s.ref === ref)?.live === true;
 }
 
 const PHONE_KEY = "js:sos-phone";

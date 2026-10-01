@@ -192,7 +192,7 @@ export function SosForm() {
         setDuplicateRef(json.reference);
         return;
       }
-      rememberSos({ ref: json.reference, token, createdAt: new Date().toISOString() });
+      rememberSos({ ref: json.reference, token, createdAt: new Date().toISOString(), live: location.source === "gps" });
       if ("vibrate" in navigator) navigator.vibrate?.([80, 60, 80]);
       router.push(`/citizen/sos/${json.reference}?t=${token}`);
     } catch (err) {

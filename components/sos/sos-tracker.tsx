@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { PriorityBadge, SosStatusBadge } from "@/components/shared/status-badges";
 import { RescueTeamMap, type SafeHospital, type SafeShelter, type TeamLocation } from "@/components/sos/rescue-team-map";
+import { LiveLocationShare } from "@/components/sos/live-location-share";
 import { SafePlaces } from "@/components/sos/safe-places";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ import { PRIORITY_DISCLAIMER, SITUATION_LABEL, type PriorityFactor } from "@/lib
 import { getSupabaseBrowserClient, prepareRealtime } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { formatClock, timeAgo } from "@/lib/utilities/format";
-import { tokenForRef } from "@/lib/utilities/my-sos";
+import { sharesLiveLocation, tokenForRef } from "@/lib/utilities/my-sos";
 import { ASSIGNMENT_STATUS_LABEL, CITIZEN_TIMELINE, isSosOpen } from "@/lib/utilities/status";
 import { cn } from "@/lib/utils";
 import type { AssignmentStatus, PriorityLevel, SosSituation, SosStatus } from "@/types/domain";
@@ -93,10 +94,12 @@ export function SosTracker({ reference, tokenFromUrl }: { reference: string; tok
   const [cancelling, setCancelling] = useState(false);
   const lastStatus = useRef<SosStatus | null>(null);
   const [announce, setAnnounce] = useState("");
+  const [shareLive, setShareLive] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- token may only exist in browser storage
     if (!tokenFromUrl) setToken(tokenForRef(reference));
+    setShareLive(sharesLiveLocation(reference));
   }, [reference, tokenFromUrl]);
 
   const load = useCallback(async () => {
@@ -267,6 +270,8 @@ export function SosTracker({ reference, tokenFromUrl }: { reference: string; tok
           {error && ` · ${error}`}
         </p>
       </section>
+
+      {shareLive && !closed && <LiveLocationShare reference={reference} token={token} />}
 
       {team && !closed && (
         <section className="rounded-2xl border-2 border-info bg-info-soft p-4 text-info-ink" data-testid="team-card">
