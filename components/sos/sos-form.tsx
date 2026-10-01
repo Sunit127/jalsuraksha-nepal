@@ -30,7 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DEMO_SOS_INPUT, EMERGENCY_CONTACTS } from "@/lib/demo/scenario";
 import { SITUATION_LABEL, type SosSituationKey } from "@/lib/risk-engine/sos-priority";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import { readSavedPhone, rememberSos, savePhone } from "@/lib/utilities/my-sos";
+import { readSavedPhone, rememberSos, savePhone, tokenForRef } from "@/lib/utilities/my-sos";
 import { RequestTimeoutError, fetchWithTimeout } from "@/lib/utilities/fetch-timeout";
 import { LocationPicker } from "@/components/map/location-picker";
 import { cn } from "@/lib/utils";
@@ -166,7 +166,8 @@ export function SosForm() {
           phone: values.phone,
           latitude: location.location.lat,
           longitude: location.location.lng,
-          locationAccuracyM: location.accuracyM ?? undefined,
+          // Network-based fixes can report accuracy beyond the API's limit.
+          locationAccuracyM: location.accuracyM === null ? undefined : Math.min(location.accuracyM, 100_000),
           locationName:
             location.source === "demo"
               ? "Riverside Tole, Bharatpur-1"
@@ -184,13 +185,16 @@ export function SosForm() {
       }
 
       savePhone(values.phone.replace(/^\+977/, ""));
-      if (json.duplicate && !json.trackingToken) {
+      // A guest's repeat SOS comes back without a token; this device may
+      // still hold it from the first send (e.g. the reply was lost).
+      const token = json.trackingToken ?? tokenForRef(json.reference);
+      if (!token) {
         setDuplicateRef(json.reference);
         return;
       }
-      rememberSos({ ref: json.reference, token: json.trackingToken!, createdAt: new Date().toISOString() });
+      rememberSos({ ref: json.reference, token, createdAt: new Date().toISOString() });
       if ("vibrate" in navigator) navigator.vibrate?.([80, 60, 80]);
-      router.push(`/citizen/sos/${json.reference}?t=${json.trackingToken}`);
+      router.push(`/citizen/sos/${json.reference}?t=${token}`);
     } catch (err) {
       setSubmitError(
         err instanceof RequestTimeoutError

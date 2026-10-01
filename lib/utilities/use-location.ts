@@ -59,12 +59,18 @@ export function useLocationState(demoMode: boolean): LocationState {
   const [error, setError] = useState<LocationError>(null);
   const [manual, setManualPoint] = useState<LatLng | null>(null);
   const [loading, setLoading] = useState(false);
+  // Bumped by useGps() so "Try again" restarts the watch even when GPS is
+  // already the selected mode.
+  const [attempt, setAttempt] = useState(0);
   const watchId = useRef<number | null>(null);
 
   // Resolve the initial mode on the client only (avoids hydration mismatch).
   useEffect(() => {
+    // A "demo" preference left over from a presentation must never place a
+    // real caller at the simulated location once demo mode is off.
+    const pref = readPref();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reading a browser-only preference after mount
-    setMode(readPref() ?? (demoMode ? "demo" : "gps"));
+    setMode(pref === "demo" && !demoMode ? "gps" : (pref ?? (demoMode ? "demo" : "gps")));
   }, [demoMode]);
 
   useEffect(() => {
@@ -114,11 +120,12 @@ export function useLocationState(demoMode: boolean): LocationState {
       if (watchId.current !== null) navigator.geolocation.clearWatch(watchId.current);
       watchId.current = null;
     };
-  }, [mode]);
+  }, [mode, attempt]);
 
   const useGps = useCallback(() => {
     writePref("gps");
     setMode("gps");
+    setAttempt((n) => n + 1);
   }, []);
   const useDemo = useCallback(() => {
     writePref("demo");

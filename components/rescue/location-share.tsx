@@ -46,13 +46,20 @@ export function LocationShare({ active }: { active: boolean }) {
       const moved = prev ? haversineMeters({ lat: prev.lat, lng: prev.lng }, { lat: latitude, lng: longitude }) : Infinity;
       const due = !prev || now - prev.at >= HEARTBEAT_MS || (now - prev.at >= MIN_INTERVAL_MS && moved >= MIN_MOVE_M);
       if (!due) return;
-      last.current = { at: now, lat: latitude, lng: longitude };
-      void shareTeamLocation({ latitude, longitude, accuracyM: accuracy, headingDeg: heading, speedMps: speed }).then((res) => {
-        if (res.ok) {
-          setState("sharing");
-          setSentAt(new Date().toISOString());
-        }
-      });
+      const sent = { at: now, lat: latitude, lng: longitude };
+      last.current = sent;
+      // A failed send is retried after MIN_INTERVAL_MS, not the full heartbeat.
+      const retryNextFix = () => {
+        if (last.current === sent) last.current = { ...sent, at: sent.at - HEARTBEAT_MS + MIN_INTERVAL_MS };
+      };
+      shareTeamLocation({ latitude, longitude, accuracyM: accuracy, headingDeg: heading, speedMps: speed })
+        .then((res) => {
+          if (res.ok) {
+            setState("sharing");
+            setSentAt(new Date().toISOString());
+          } else retryNextFix();
+        })
+        .catch(retryNextFix);
     };
     const id = navigator.geolocation.watchPosition(send, (err) => setState(err.code === err.PERMISSION_DENIED ? "denied" : "unavailable"), {
       enableHighAccuracy: true,

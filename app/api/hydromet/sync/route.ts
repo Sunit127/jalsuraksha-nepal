@@ -25,8 +25,13 @@ async function handle(request: NextRequest) {
     const auth = await authorize("dashboard");
     if (!auth.ok) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
-  const summary = await syncHydromet();
-  return NextResponse.json(summary, { status: summary.ok ? 200 : 502 });
+  try {
+    const summary = await syncHydromet();
+    return NextResponse.json(summary, { status: summary.ok ? 200 : 502 });
+  } catch (error) {
+    console.error("[api/hydromet/sync] failed", error);
+    return NextResponse.json({ ok: false, error: "Sync failed." }, { status: 502 });
+  }
 }
 
 export const GET = handle;

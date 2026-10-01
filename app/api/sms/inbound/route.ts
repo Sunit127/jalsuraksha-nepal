@@ -64,8 +64,19 @@ export async function POST(request: NextRequest) {
   });
   if (!payload.success) return NextResponse.json({ error: "Invalid SOS.", reply: SMS_HELP }, { status: 422 });
 
-  const result = await createSosRequest(payload.data, { userId: null, source: "sms" });
-  if (!result.ok) return NextResponse.json({ error: result.error }, { status: 500 });
+  let result: Awaited<ReturnType<typeof createSosRequest>>;
+  try {
+    result = await createSosRequest(payload.data, { userId: null, source: "sms" });
+  } catch (error) {
+    console.error("[api/sms/inbound] failed", error);
+    result = { ok: false, error: "SOS service unavailable." };
+  }
+  if (!result.ok) {
+    return NextResponse.json(
+      { error: result.error, reply: "JalSuraksha: your SOS could NOT be registered. Call 100 (Police) or 102 (Ambulance) now." },
+      { status: 500 },
+    );
+  }
   return NextResponse.json({
     reference: result.reference,
     reply: `JalSuraksha: ${result.reference} received${result.duplicate ? " (already active)" : ""}. Stay safe, move higher if water rises. In danger call 100.`,

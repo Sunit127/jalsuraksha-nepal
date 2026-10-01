@@ -92,7 +92,7 @@ export async function resolveSos(sosId: string, note?: string): Promise<OpsResul
   if (!ctx) return DENIED;
   const { error } = await ctx.supabase.rpc("resolve_sos", {
     p_sos_id: id.data,
-    p_note: note?.slice(0, 300) || undefined,
+    p_note: (typeof note === "string" && note.trim().slice(0, 300)) || undefined,
   });
   if (error) return { ok: false, error: friendlyWorkflowError(error.message) };
   return { ok: true, message: "Incident marked resolved." };
@@ -178,7 +178,7 @@ export async function setAlertActive(alertId: string, active: boolean): Promise<
   if (!id.success) return { ok: false, error: "Unknown alert." };
   const ctx = await staffClient();
   if (!ctx) return DENIED;
-  const { error } = await ctx.supabase.from("alerts").update({ is_active: active }).eq("id", id.data);
+  const { error } = await ctx.supabase.from("alerts").update({ is_active: active === true }).eq("id", id.data);
   if (error) return { ok: false, error: "Could not update the alert." };
   revalidatePath("/dashboard/alerts");
   return { ok: true, message: active ? "Alert re-activated." : "Alert withdrawn." };
@@ -356,8 +356,11 @@ export type TeamInput = {
 export async function saveTeam(input: TeamInput): Promise<OpsResult> {
   const auth = await authorize("admin");
   if (!auth.ok) return DENIED;
-  const callSign = input.callSign.trim().toUpperCase().slice(0, 20);
-  const name = input.name.trim().slice(0, 120);
+  // An edit with a malformed id must not silently create a second team.
+  const id = input.id ? uuidSchema.safeParse(input.id) : null;
+  if (id && !id.success) return { ok: false, error: "Unknown team." };
+  const callSign = String(input.callSign ?? "").trim().toUpperCase().slice(0, 20);
+  const name = String(input.name ?? "").trim().slice(0, 120);
   const personnel = Math.round(Number(input.personnelCount));
   const lat = Number(input.latitude);
   const lng = Number(input.longitude);
@@ -369,7 +372,7 @@ export async function saveTeam(input: TeamInput): Promise<OpsResult> {
     call_sign: callSign,
     name,
     personnel_count: personnel,
-    equipment: input.equipment.split(",").map((e) => e.trim()).filter(Boolean).slice(0, 20),
+    equipment: String(input.equipment ?? "").split(",").map((e) => e.trim()).filter(Boolean).slice(0, 20),
     contact_phone: input.contactPhone?.trim() || null,
     base_location: input.baseLocation?.trim() || null,
     latitude: lat,
@@ -379,7 +382,6 @@ export async function saveTeam(input: TeamInput): Promise<OpsResult> {
     data_source: "Entered by administrator",
   };
   const supabase = await createSupabaseServerClient();
-  const id = input.id ? uuidSchema.safeParse(input.id) : null;
   const { error } = id?.success
     ? await supabase.from("rescue_teams").update(row).eq("id", id.data)
     : await supabase.from("rescue_teams").insert({ ...row, status: "offline" });
