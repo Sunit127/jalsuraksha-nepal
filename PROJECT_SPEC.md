@@ -53,7 +53,7 @@ team view) sharing one live database:
 | Maps | Leaflet + react-leaflet + OpenStreetMap tiles | Lazy-loaded client-only |
 | Live hydro-met data | DHM (hydrology.gov.np) gauges and rain stations via the BIPAD portal API | `lib/hydromet/*`; synced into `hydromet_stations` (lazy `after()` every 10 min, or `/api/hydromet/sync` from a scheduler) |
 | Reference data | BIPAD portal (facilities), OpenStreetMap via Overpass (wards, community buildings) | `npm run data:import`; see `docs/REAL_DATA.md` |
-| Routing | Self-hosted Valhalla on the OpenStreetMap Nepal extract | `docker-compose.routing.yml`, `VALHALLA_URL`; offline demo network as fallback |
+| Routing | Valhalla on OpenStreetMap roads: the public FOSSGIS instance (`https://valhalla1.openstreetmap.de`, fair use, demo scale) on the hosted app, or self-hosted for production | `VALHALLA_URL`; `docker-compose.routing.yml` for self-hosting; offline demo network as fallback |
 | Charts | Recharts | Operations analytics |
 | Tests | Vitest | Pure business logic |
 | Hosting | Vercel | |

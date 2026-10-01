@@ -100,6 +100,7 @@ Under **Project Settings → API Keys**, copy:
    | `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER` | one of the two |
    | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | a key pair from `npx web-push generate-vapid-keys` (lock-screen alerts) |
    | `VAPID_SUBJECT` | your site URL, e.g. `https://<your-vercel-domain>` |
+   | `VALHALLA_URL` | real-road routing: `https://valhalla1.openstreetmap.de` (free public FOSSGIS server, fair use) or your own Valhalla server |
 
    Lock-screen alerts work in Chrome/Edge/Firefox on Android and desktop. On
    iPhone/iPad (iOS 16.4+) they work only after the citizen adds the app to

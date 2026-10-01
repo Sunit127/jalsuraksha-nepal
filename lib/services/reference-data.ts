@@ -20,7 +20,7 @@ type Admin = SupabaseClient<Database>;
 const BIPAD = "https://bipadportal.gov.np/api/v1";
 /** Public Overpass servers are shared and sometimes busy: try a mirror too. */
 const OVERPASS_SERVERS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"];
-export const DATA_USER_AGENT = "JalSurakshaNepal/0.1 (flood emergency response; +https://github.com/jalsuraksha-nepal)";
+export const DATA_USER_AGENT = "JalSurakshaNepal/0.1 (flood emergency response; +https://github.com/Sunit127/jalsuraksha-nepal)";
 
 async function fetchJson<T>(url: string, init?: RequestInit, timeoutMs = 90_000): Promise<T> {
   const res = await fetch(url, {

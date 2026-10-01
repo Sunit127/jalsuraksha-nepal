@@ -1,6 +1,6 @@
 /**
- * Real road routing with a self-hosted Valhalla server on OpenStreetMap
- * roads. Hazard-aware: every blocking hazard (flooded road, blocked bridge,
+ * Real road routing with a Valhalla server on OpenStreetMap roads: self-hosted
+ * (docker-compose.routing.yml) or a public instance such as FOSSGIS. Hazard-aware: every blocking hazard (flooded road, blocked bridge,
  * landslide, severe waterlogging…) becomes an `exclude_polygons` area so the
  * walking route goes around it; non-blocking hazards near the route are
  * reported as cautions. Returns the same RouteResult as the offline demo
@@ -19,6 +19,8 @@ import {
 /** Shelters tried per request (nearest by straight line). */
 const CANDIDATES = 4;
 const WALK_M_PER_MIN = 75;
+/** Public Valhalla servers (e.g. FOSSGIS) ask clients to identify themselves. */
+const ROUTING_USER_AGENT = "JalSurakshaNepal/0.1 (flood emergency response; +https://github.com/Sunit127/jalsuraksha-nepal)";
 
 /** Decodes a Valhalla polyline (precision 6). */
 export function decodePolyline6(encoded: string): LatLng[] {
@@ -86,7 +88,7 @@ export async function valhallaRoute(
 ): Promise<ValhallaLeg | null> {
   const res = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/route`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "User-Agent": ROUTING_USER_AGENT },
     body: JSON.stringify({
       locations: [
         { lat: from.lat, lon: from.lng },

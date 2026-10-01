@@ -265,7 +265,9 @@ npm run routing:download   # Nepal OpenStreetMap extract (~400 MB)
 npm run routing:up         # self-hosted Valhalla; first start builds tiles, then serves :8002
 ```
 
-Set `VALHALLA_URL=http://localhost:8002` in `.env.local`. Live DHM river and
+Set `VALHALLA_URL=http://localhost:8002` in `.env.local`. Without Docker, use
+the free public FOSSGIS server instead: `VALHALLA_URL=https://valhalla1.openstreetmap.de`
+(fair use only — fine for demos; self-host for real deployments). Live DHM river and
 rain readings sync automatically (every 10 minutes while the app is used;
 **Dashboard → Data sources → Sync now** forces it). Without Valhalla the app
 uses its offline demo road network and labels routes approximate. Everything
