@@ -1,0 +1,190 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * JalSuraksha design tokens.
+ * Neutral white/slate surfaces, dark navy chrome. Status colours carry meaning
+ * only and are always paired with a text label + icon in the UI.
+ */
+:root {
+  --radius: 0.75rem;
+
+  --background: oklch(0.985 0.003 247);
+  --foreground: oklch(0.21 0.034 264);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.034 264);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.034 264);
+
+  /* Navy primary */
+  --primary: oklch(0.26 0.06 262);
+  --primary-foreground: oklch(0.985 0.003 247);
+  --secondary: oklch(0.955 0.008 255);
+  --secondary-foreground: oklch(0.26 0.06 262);
+  --muted: oklch(0.962 0.006 255);
+  --muted-foreground: oklch(0.52 0.03 257);
+  --accent: oklch(0.95 0.012 250);
+  --accent-foreground: oklch(0.26 0.06 262);
+  --destructive: oklch(0.577 0.225 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.915 0.01 255);
+  --input: oklch(0.89 0.012 255);
+  --ring: oklch(0.55 0.15 255);
+
+  /* Operations chrome */
+  --navy: oklch(0.2 0.045 264);
+  --navy-foreground: oklch(0.96 0.01 255);
+  --navy-muted: oklch(0.27 0.045 264);
+
+  /* Status scale */
+  --safe: oklch(0.6 0.15 150);
+  --safe-soft: oklch(0.96 0.045 155);
+  --safe-ink: oklch(0.38 0.1 152);
+  /* "-strong" variants: backgrounds that carry white text (WCAG AA 4.5:1). */
+  --safe-strong: oklch(0.47 0.12 152);
+  --watch: oklch(0.8 0.16 85);
+  --watch-soft: oklch(0.97 0.06 95);
+  --watch-ink: oklch(0.45 0.1 70);
+  --high: oklch(0.68 0.19 45);
+  --high-soft: oklch(0.96 0.045 55);
+  --high-ink: oklch(0.47 0.15 40);
+  --high-strong: oklch(0.53 0.17 40);
+  --danger: oklch(0.577 0.225 27);
+  --danger-soft: oklch(0.96 0.03 20);
+  --danger-ink: oklch(0.45 0.18 27);
+  --info: oklch(0.58 0.15 250);
+  --info-soft: oklch(0.96 0.025 250);
+  --info-ink: oklch(0.42 0.13 255);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
+  --color-navy-muted: var(--navy-muted);
+
+  --color-safe: var(--safe);
+  --color-safe-soft: var(--safe-soft);
+  --color-safe-ink: var(--safe-ink);
+  --color-safe-strong: var(--safe-strong);
+  --color-watch: var(--watch);
+  --color-watch-soft: var(--watch-soft);
+  --color-watch-ink: var(--watch-ink);
+  --color-high: var(--high);
+  --color-high-soft: var(--high-soft);
+  --color-high-ink: var(--high-ink);
+  --color-high-strong: var(--high-strong);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-ink: var(--danger-ink);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-ink: var(--info-ink);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv11", "ss01";
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  /* Implicit single-column grids size to minmax(0, 1fr) instead of "auto",
+     so long/truncated content can't push layouts wider than a small phone.
+     Explicit grid-cols-* utilities (utilities layer) still take precedence. */
+  :where(.grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .label-caps {
+    @apply text-[11px] font-semibold uppercase tracking-[0.08em];
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Leaflet: isolate its internal z-indexes so dialogs/nav always sit above the map. */
+.leaflet-container {
+  font: inherit;
+  background: var(--muted);
+  isolation: isolate;
+  z-index: 0;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px -10px rgb(15 23 42 / 0.35);
+}
+.leaflet-popup-content {
+  margin: 12px 14px;
+  min-width: 220px;
+}
+.js-marker {
+  background: transparent;
+  border: 0;
+}
+
+@keyframes js-pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.js-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: js-pulse 1.6s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js-pulse::after {
+    animation: none;
+  }
+}

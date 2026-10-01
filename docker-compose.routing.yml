@@ -1,0 +1,20 @@
+# Self-hosted Valhalla routing for real-road evacuation routes.
+#   npm run routing:download   # Nepal OpenStreetMap extract (~400 MB, Geofabrik)
+#   npm run routing:up         # builds tiles on first start (~10–20 min), then serves :8002
+# Set VALHALLA_URL=http://localhost:8002 in .env.local.
+services:
+  valhalla:
+    image: ghcr.io/valhalla/valhalla-scripted:latest
+    container_name: jalsuraksha-valhalla
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./routing/custom_files:/custom_files
+    environment:
+      - serve_tiles=True
+      - build_admins=False
+      - build_time_zones=False
+      - build_elevation=False
+      - force_rebuild=False
+      - server_threads=4
