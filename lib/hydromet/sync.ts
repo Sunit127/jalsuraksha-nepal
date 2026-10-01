@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { inPilotBbox } from "@/lib/geo/pilot-area";
+import { FORECAST_MAX_AGE_MS, fetchRainForecast, type RainForecast } from "@/lib/hydromet/forecast";
 import { sendAlertPush } from "@/lib/services/push";
 import { DATA_USER_AGENT } from "@/lib/services/reference-data";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -187,7 +188,25 @@ async function runSync(admin: Admin): Promise<SyncSummary> {
     console.error("[hydromet] sync failed", summary.error);
   }
   await admin.from("app_settings").upsert({ key: "hydromet_last_sync", value: summary as unknown as NonNullable<Json> });
+  await refreshRainForecast(admin, now);
   return summary;
+}
+
+/**
+ * Rain forecast for every risk zone (Open-Meteo), at most once an hour. A
+ * failed fetch keeps the previous forecast; it never affects the river sync.
+ */
+async function refreshRainForecast(admin: Admin, now: Date) {
+  try {
+    const { data: current } = await admin.from("app_settings").select("value").eq("key", "rain_forecast").maybeSingle();
+    const prev = current?.value as RainForecast | undefined;
+    if (prev?.ok && now.getTime() - new Date(prev.at).getTime() < FORECAST_MAX_AGE_MS) return;
+    const { data: zones } = await admin.from("risk_zones").select("id, name, center_latitude, center_longitude").order("name");
+    const forecast = await fetchRainForecast(zones ?? [], fetch, now);
+    await admin.from("app_settings").upsert({ key: "rain_forecast", value: forecast as unknown as NonNullable<Json> });
+  } catch (error) {
+    console.error("[forecast] refresh failed", error instanceof Error ? error.message : error);
+  }
 }
 
 const npt = (iso: string) =>
