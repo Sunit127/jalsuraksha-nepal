@@ -109,6 +109,7 @@ Next.js on Vercel                                                 │
        ├─ POST /api/sos/cancel  guest "I am safe now" (token)      │
        ├─ POST /api/sos/location live caller position (token)     │
        ├─ POST /api/push/subscribe lock-screen alert opt-in        │
+       ├─ GET  /api/sos/mine    signed-in account's own SOS codes  │
        ├─ POST /api/uploads     type/size-validated photo upload   │
        ├─ GET  /api/public/snapshot  offline cache payload         │
        ├─ POST /api/sms/inbound future SMS gateway (secret-gated)  │
@@ -301,6 +302,10 @@ citizens may cancel from any open state. Authoritative table:
    longitude` and `location_updated_at`, so staff and team maps follow the
    caller through Realtime. Positions sent from the map picker or the demo
    location are never overwritten, and a closed SOS keeps its last position.
+   A signed-in citizen can follow their SOS on any device: the home "Your
+   SOS" card and the tracker fetch the account's own SOS (last 24 h) and
+   tracking codes from `/api/sos/mine`, so a victim who signs in on another
+   phone, or after clearing the browser, still sees every rescue step.
    The dashboard overview selects each newly arrived SOS so the map flies to
    the caller, even outside the area in view.
 7. **Operations dashboard** — KPIs, live map, filterable/sortable incident

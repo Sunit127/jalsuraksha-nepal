@@ -35,7 +35,7 @@ import { PRIORITY_DISCLAIMER, SITUATION_LABEL, type PriorityFactor } from "@/lib
 import { getSupabaseBrowserClient, prepareRealtime } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { formatClock, timeAgo } from "@/lib/utilities/format";
-import { sharesLiveLocation, tokenForRef } from "@/lib/utilities/my-sos";
+import { sharesLiveLocation, syncAccountSos, tokenForRef } from "@/lib/utilities/my-sos";
 import { ASSIGNMENT_STATUS_LABEL, CITIZEN_TIMELINE, isSosOpen } from "@/lib/utilities/status";
 import { cn } from "@/lib/utils";
 import type { AssignmentStatus, PriorityLevel, SosSituation, SosStatus } from "@/types/domain";
@@ -95,11 +95,28 @@ export function SosTracker({ reference, tokenFromUrl }: { reference: string; tok
   const lastStatus = useRef<SosStatus | null>(null);
   const [announce, setAnnounce] = useState("");
   const [shareLive, setShareLive] = useState(false);
+  // Looking up the signed-in account's own SOS when this device has no code.
+  const [lookingUp, setLookingUp] = useState(!tokenFromUrl);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- token may only exist in browser storage
-    if (!tokenFromUrl) setToken(tokenForRef(reference));
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading browser-only storage after mount
     setShareLive(sharesLiveLocation(reference));
+    if (tokenFromUrl) return;
+    const local = tokenForRef(reference);
+    if (local) {
+      setToken(local);
+      setLookingUp(false);
+      return;
+    }
+    let alive = true;
+    void syncAccountSos().then(() => {
+      if (!alive) return;
+      setToken(tokenForRef(reference));
+      setLookingUp(false);
+    });
+    return () => {
+      alive = false;
+    };
   }, [reference, tokenFromUrl]);
 
   const load = useCallback(async () => {
@@ -200,13 +217,22 @@ export function SosTracker({ reference, tokenFromUrl }: { reference: string; tok
     }
   }
 
+  if (!token && lookingUp) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" /> Loading SOS status…
+      </div>
+    );
+  }
+
   if (!token) {
     return (
       <Alert variant="warning">
         <AlertTitle>Tracking link incomplete</AlertTitle>
         <AlertDescription>
           This device does not have the tracking code for {reference}. Your request is still with the
-          control centre. Open the link shown right after sending, or call 100.
+          control centre. Sign in with the account that sent it, open the link shown right after sending, or
+          call 100.
         </AlertDescription>
       </Alert>
     );

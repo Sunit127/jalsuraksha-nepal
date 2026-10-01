@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronRight, Radio, Siren, Truck } from "lucide-react";
 import { formatDistance } from "@/lib/utilities/geo";
-import { readMySos, type MySos } from "@/lib/utilities/my-sos";
+import { readMySos, syncAccountSos, type MySos } from "@/lib/utilities/my-sos";
 import { ASSIGNMENT_STATUS_LABEL, SOS_STATUS_LABEL } from "@/lib/utilities/status";
 import { timeAgo } from "@/lib/utilities/format";
 import type { AssignmentStatus, SosStatus } from "@/types/domain";
@@ -19,17 +19,22 @@ type Summary = {
 };
 
 const REFRESH_MS = 10_000;
+/** Re-check the account's own SOS (sent from another device) every minute. */
+const ACCOUNT_SYNC_EVERY = 6;
 
 /**
- * On the citizen home: the open SOS sent from this device, with where the
- * rescue team is. Tapping opens the full tracker (map, timeline, safe places).
+ * On the citizen home: the open SOS sent from this device or by the
+ * signed-in account, with where the rescue team is. Tapping opens the full
+ * tracker (map, timeline, safe places).
  */
 export function ActiveSosCard() {
   const [summary, setSummary] = useState<Summary | null>(null);
+  const loads = useRef(0);
 
   const load = useCallback(async () => {
     const dayAgo = Date.now() - 86_400_000;
-    const recent = readMySos().filter((s: MySos) => new Date(s.createdAt).getTime() > dayAgo);
+    const mine = loads.current++ % ACCOUNT_SYNC_EVERY === 0 ? await syncAccountSos() : readMySos();
+    const recent = mine.filter((s: MySos) => new Date(s.createdAt).getTime() > dayAgo);
     for (const s of recent) {
       try {
         const res = await fetch(`/api/sos/track?ref=${encodeURIComponent(s.ref)}&token=${encodeURIComponent(s.token)}`, { cache: "no-store" });
