@@ -4,13 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { BellRing, Volume2 } from "lucide-react";
 import { useCitizenData } from "@/components/shared/citizen-data";
-import { alarmSoundReady, playAlarmBurst, unlockAlarmSound } from "@/lib/utilities/alarm-sound";
+import { alarmSoundUnlocked, startAlarm, stopAlarm, unlockAlarmSound } from "@/lib/utilities/alarm-sound";
 import { formatClock, timeAgo } from "@/lib/utilities/format";
 import { cn } from "@/lib/utils";
 import type { Alert } from "@/types/domain";
 
 const KEY = "js:alert-alarm:v1";
-const BURST_MS = 1500;
+const VIBRATE_MS = 1500;
 
 const TONE: Record<Alert["severity"], string> = {
   danger: "bg-danger",
@@ -47,7 +47,9 @@ export function AlertAlarm() {
   const { alerts } = useCitizenData();
   const [acked, setAcked] = useState<Set<string> | null>(null);
   const [soundOn, setSoundOn] = useState(false);
+  const [unlocked, setUnlocked] = useState(true);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const ringingRef = useRef<{ id: string; urgent: boolean } | null>(null);
 
   useEffect(() => {
     const stored = readAcked();
@@ -59,11 +61,16 @@ export function AlertAlarm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Sound needs a user gesture first; any tap or key press in the app unlocks it.
+  // Sound needs a user gesture first; any tap or key press in the app unlocks
+  // it (and starts a blocked siren straight away).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- browser-only state after mount
+    setUnlocked(alarmSoundUnlocked());
     const unlock = () => {
-      unlockAlarmSound();
-      setTimeout(() => setSoundOn(alarmSoundReady()), 100);
+      const r = ringingRef.current;
+      if (r) void startAlarm(r.urgent).then(setSoundOn);
+      else unlockAlarmSound();
+      setTimeout(() => setUnlocked(alarmSoundUnlocked()), 300);
     };
     window.addEventListener("pointerdown", unlock);
     window.addEventListener("keydown", unlock);
@@ -80,24 +87,38 @@ export function AlertAlarm() {
   const currentId = current?.id;
   const urgent = current?.severity === "danger" || current?.severity === "high";
 
-  // Repeat until closed.
+  // Siren loops until closed; vibration repeats alongside it.
   useEffect(() => {
     if (!currentId) return;
-    const ring = () => {
-      playAlarmBurst(urgent);
-      if ("vibrate" in navigator) navigator.vibrate?.([250, 120, 250]);
-      setSoundOn(alarmSoundReady());
+    ringingRef.current = { id: currentId, urgent };
+    void startAlarm(urgent).then(setSoundOn);
+    const buzz = () => {
+      if ("vibrate" in navigator) navigator.vibrate?.([400, 150, 400]);
     };
-    ring();
-    const t = setInterval(ring, BURST_MS);
+    buzz();
+    const t = setInterval(buzz, VIBRATE_MS);
     closeRef.current?.focus();
     return () => {
+      ringingRef.current = null;
       clearInterval(t);
+      stopAlarm();
       if ("vibrate" in navigator) navigator.vibrate?.(0);
     };
   }, [currentId, urgent]);
 
-  if (!current) return null;
+  if (!current) {
+    if (unlocked || !acked) return null;
+    return (
+      <button
+        type="button"
+        onClick={() => unlockAlarmSound()}
+        className="fixed inset-x-0 bottom-20 z-50 mx-auto flex w-fit items-center gap-2 rounded-full bg-danger px-4 py-2 text-xs font-bold text-white shadow-lg"
+        data-testid="enable-siren"
+      >
+        <Volume2 className="size-4" aria-hidden /> Tap to enable flood alert siren
+      </button>
+    );
+  }
 
   function close() {
     if (!acked || !current) return;
@@ -136,7 +157,7 @@ export function AlertAlarm() {
           </p>
           {!soundOn && (
             <p className="flex items-center gap-1.5 rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">
-              <Volume2 className="size-4 shrink-0" aria-hidden /> Tap anywhere to sound the alarm.
+              <Volume2 className="size-4 shrink-0" aria-hidden /> Tap anywhere to sound the siren. Turn your volume up.
             </p>
           )}
           <button
