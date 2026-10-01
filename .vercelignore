@@ -1,0 +1,7 @@
+# Keep deploy uploads to the app source; Vercel installs and builds itself.
+/routing
+/node_modules
+/.next
+/supabase/.temp
+/docs/screenshots
+.env*
