@@ -19,6 +19,11 @@ const TONE: Record<Alert["severity"], string> = {
   info: "bg-info",
 };
 
+function canVibrate(): boolean {
+  const activation = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
+  return activation ? activation.hasBeenActive : true;
+}
+
 /** Alert ids this device has closed. `null` until read (no alarm before that). */
 function readAcked(): Set<string> | null {
   try {
@@ -93,7 +98,8 @@ export function AlertAlarm() {
     ringingRef.current = { id: currentId, urgent };
     void startAlarm(urgent).then(setSoundOn);
     const buzz = () => {
-      if ("vibrate" in navigator) navigator.vibrate?.([400, 150, 400]);
+      // Browsers only allow vibration after the person has tapped the page.
+      if ("vibrate" in navigator && canVibrate()) navigator.vibrate?.([400, 150, 400]);
     };
     buzz();
     const t = setInterval(buzz, VIBRATE_MS);
@@ -102,7 +108,7 @@ export function AlertAlarm() {
       ringingRef.current = null;
       clearInterval(t);
       stopAlarm();
-      if ("vibrate" in navigator) navigator.vibrate?.(0);
+      if ("vibrate" in navigator && canVibrate()) navigator.vibrate?.(0);
     };
   }, [currentId, urgent]);
 
