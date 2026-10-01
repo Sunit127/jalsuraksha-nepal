@@ -228,8 +228,9 @@ citizens may cancel from any open state. Authoritative table:
 
 1. **Alerts** — severity-coloured banners with text labels and explicit source
    ("JalSuraksha Hackathon Demo" for simulated). A new alert raises a
-   full-screen alarm on every citizen screen: a repeating "beep-beep" (Web
-   Audio, unlocked by the first tap) plus vibration until the person taps
+   full-screen alarm on every citizen screen: a loud, near-continuous siren
+   (Web Audio, compressed; rising yelps for high/danger, sharp beeps for
+   watch/info; unlocked by the first tap) plus vibration until the person taps
    "stop alarm". Closed alerts are remembered per device; alerts published
    while the app was closed ring on the next open while still active; on a
    device's first visit the already-active alerts count as seen. If the

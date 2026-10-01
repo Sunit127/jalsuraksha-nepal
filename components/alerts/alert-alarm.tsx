@@ -38,8 +38,8 @@ function writeAcked(ids: Set<string>) {
 }
 
 /**
- * Full-screen alarm for alerts published by the control centre. It repeats a
- * "beep-beep" (and vibrates) until the person closes it. Alerts that arrive
+ * Full-screen alarm for alerts published by the control centre. It sounds a
+ * loud siren (and vibrates) until the person closes it. Alerts that arrive
  * while the app is closed ring the next time it opens, if still active. On a
  * device's first visit the alerts already active are treated as seen.
  */
